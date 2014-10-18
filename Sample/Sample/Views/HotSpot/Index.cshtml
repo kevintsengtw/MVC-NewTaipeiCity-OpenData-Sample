@@ -1,0 +1,124 @@
+﻿@using PagedList
+@using PagedList.Mvc
+@model PagedList.StaticPagedList<Sample.Models.HotSpot>   
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<div class="row">
+    <h2>
+        練習題 - 新北市 WIFI 熱點
+        <small>
+            資料來源：
+            <a href="http://data.ntpc.gov.tw/NTPC/" target="_blank">
+                新北市政府資料開放平台
+            </a>
+            -
+            <a href="http://data.ntpc.gov.tw/NTPC/od/query?_m=detail&oid=04958686-1B92-4B74-889D-9F34409B272B" target="_blank">
+                新北市WIFI熱點
+            </a>
+        </small>
+    </h2>
+</div>
+<hr />
+<div class="row well">
+    <form class="form" role="form">
+        <div class="col-lg-3">
+            <div class="input-group">
+                <span class="input-group-addon">區域</span>
+                @Html.DropDownList("Districts", null, "全部", new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="input-group">
+                <span class="input-group-addon">熱點分類</span>
+                @Html.DropDownList("Types", null, "全部", new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="input-group">
+                <span class="input-group-addon">業者</span>
+                @Html.DropDownList("Companys", null, "全部", new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="col-lg-2">
+            <button type="submit" id="ButtonSubmit" class="btn btn-primary">
+                <span class="glyphicon glyphicon-search"></span> 查詢
+            </button>
+        </div>
+    </form>
+</div>
+
+@Html.PagedListPager((IPagedList)Model,
+        page => Url.Action("Index", new
+        {
+            page = page,
+            districts = ViewBag.SelectedDistrict,
+            types = ViewBag.SelectedType,
+            company = ViewBag.SelectedCompany
+        }),
+        PagedListRenderOptions.ClassicPlusFirstAndLast)
+
+<table class="table table-striped table-hover">
+    <thead>
+        <tr style="background-color: #d3efff;">
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Spot_Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Type)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Company)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().District)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Address)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Apparatus_Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Latitude)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Longitude)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Spot_Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Company)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.District)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Address)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Apparatus_Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Latitude)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Longitude)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
