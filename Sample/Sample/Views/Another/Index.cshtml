@@ -1,0 +1,143 @@
+﻿@using PagedList
+@using PagedList.Mvc
+@model Sample.ViewModels.HotSpotViewModel
+
+@{
+    ViewBag.Title = "Another - Form.Post";
+}
+
+<div class="row">
+    <h2>
+        練習題 - 新北市 WIFI 熱點 (Form.Post)
+        <small>
+            資料來源：
+            <a href="http://data.ntpc.gov.tw/NTPC/" target="_blank">
+                新北市政府資料開放平台
+            </a>
+            -
+            <a href="http://data.ntpc.gov.tw/NTPC/od/query?_m=detail&oid=04958686-1B92-4B74-889D-9F34409B272B" target="_blank">
+                新北市WIFI熱點
+            </a>
+        </small>
+    </h2>
+</div>
+<hr />
+<div class="row well">
+    @using (Html.BeginForm("Index", "Another", FormMethod.Post, new { @class = "form-horizontal", role = "form", id = "HotSpotList" }))
+    {
+        <div class="col-lg-3">
+            <div class="input-group">
+                <span class="input-group-addon">區域</span>
+                @Html.DropDownListFor(x => x.SearchParameter.District, Model.Districts, "全部", new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="input-group">
+                <span class="input-group-addon">熱點分類</span>
+                @Html.DropDownListFor(x => x.SearchParameter.HotSpotType, Model.HotSpotTypes, "全部", new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="input-group">
+                <span class="input-group-addon">業者</span>
+                @Html.DropDownListFor(x => x.SearchParameter.Company, Model.Companys, "全部", new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="col-lg-2">
+            <button type="submit" id="ButtonSubmit" class="btn btn-primary">
+                <span class="glyphicon glyphicon-search"></span> 查詢
+            </button>
+        </div>
+    }
+</div>
+
+@Html.PagedListPager(
+        Model.HotSpots,
+        page => Url.Action("Index", new { page = page }),
+        PagedListRenderOptions.ClassicPlusFirstAndLast)
+
+<table class="table table-striped table-hover">
+    <thead>
+        <tr style="background-color: #d3efff;">
+            <th>
+                @Html.DisplayNameFor(model => model.HotSpots.FirstOrDefault().Spot_Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HotSpots.FirstOrDefault().Type)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HotSpots.FirstOrDefault().Company)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HotSpots.FirstOrDefault().District)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HotSpots.FirstOrDefault().Address)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HotSpots.FirstOrDefault().Apparatus_Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HotSpots.FirstOrDefault().Latitude)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HotSpots.FirstOrDefault().Longitude)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var item in Model.HotSpots)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Spot_Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Company)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.District)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Address)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Apparatus_Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Latitude)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Longitude)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(function () {
+            $('.pagination>li>a[href]').each(function (i, item) {
+                var page = $(item).attr('href').replace('/Another?page=', '');
+                $(item).attr('href', '#').click(function () { postPage(page); });
+
+            });
+        });
+
+        function postPage(page) {
+            var targetFormId = '#HotSpotList';
+            if ($(targetFormId).size() > 0) {
+                $('<input>')
+                    .attr({ type: 'hidden', id: 'PageIndex', name: 'PageIndex', value: page })
+                    .appendTo($(targetFormId));
+                $(targetFormId).submit();
+            }
+        };
+    </script>
+}

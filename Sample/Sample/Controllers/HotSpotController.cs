@@ -1,8 +1,9 @@
-﻿using Newtonsoft.Json;
-using PagedList;
+﻿using PagedList;
 using Sample.Models;
+using ServiceStack;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.Caching;
@@ -25,9 +26,9 @@ namespace Sample.Controllers
         /// <param name="companys">The companys.</param>
         /// <returns></returns>
         public async Task<ActionResult> Index(
-            int? page, 
-            string districts, 
-            string types, 
+            int? page,
+            string districts,
+            string types,
             string companys)
         {
             //區域
@@ -74,7 +75,8 @@ namespace Sample.Controllers
                            .Skip((pageIndex - 1) * pageSize)
                            .Take(pageSize);
 
-            var pagedResult = new StaticPagedList<HotSpot>(source, pageIndex, pageSize, totalCount);
+            var pagedResult = 
+                new StaticPagedList<HotSpot>(source, pageIndex, pageSize, totalCount);
 
             return View(pagedResult);
         }
@@ -94,7 +96,7 @@ namespace Sample.Controllers
                 Text = item,
                 Value = item,
                 Selected = !string.IsNullOrWhiteSpace(selectedItem)
-                           && 
+                           &&
                            item.Equals(selectedItem, StringComparison.OrdinalIgnoreCase)
             });
             return selectList.ToList();
@@ -166,17 +168,36 @@ namespace Sample.Controllers
 
             var response = await client.GetStringAsync(TargetUri);
 
-            var collection =
-                JsonConvert.DeserializeObject<IEnumerable<HotSpot>>(response);
+            //=====================================================================================
+
+            var sw = new Stopwatch();
+            sw.Start();
+
+            //使用 JSON.Net
+            //var collection =
+            //    JsonConvert.DeserializeObject<IEnumerable<HotSpot>>(response);
+
+            //使用 ServiceStack.Text (速度比 JSON.Net 快)
+            var collection = response.FromJson<IEnumerable<HotSpot>>();
+
+            sw.Stop();
+            var ts = sw.Elapsed;
+
+            var elapsedTime = String.Format("{0:00}h : {1:00}m :{2:00}s .{3:000}ms",
+                ts.Hours, ts.Minutes, ts.Seconds,
+                ts.Milliseconds / 10);
+            Debug.WriteLine("RunTime: " + elapsedTime);
+
+            //=====================================================================================
 
             //資料快取
             ObjectCache cacheItem = MemoryCache.Default;
-            
+
             var policy = new CacheItemPolicy
             {
                 AbsoluteExpiration = DateTime.Now.AddMinutes(30)
             };
-            
+
             cacheItem.Add(cacheName, collection, policy);
 
             return collection;
