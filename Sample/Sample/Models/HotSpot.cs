@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Sample.Models
 {
@@ -35,4 +31,5 @@ namespace Sample.Models
         [Display(Name = "經度")]
         public string Longitude { get; set; }
     }
+
 }

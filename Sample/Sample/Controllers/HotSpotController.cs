@@ -13,6 +13,9 @@ namespace Sample.Controllers
 {
     public class HotSpotController : Controller
     {
+        const string TargetUri = "http://data.ntpc.gov.tw/NTPC/od/data/api/IMC123/?$format=json";
+        const string CacheName = "WIFI_HOTSPOT";
+
         /// <summary>
         /// Indexes the specified page.
         /// </summary>
@@ -136,18 +139,16 @@ namespace Sample.Controllers
         /// <returns></returns>
         private async Task<IEnumerable<HotSpot>> GetHotSpotData()
         {
-            const string cacheName = "WIFI_HOTSPOT";
-
             ObjectCache cache = MemoryCache.Default;
-            var cacheContents = cache.GetCacheItem(cacheName);
 
-            if (cacheContents == null)
+            if (cache.Contains(CacheName))
             {
-                return await RetriveHotSpotData(cacheName);
+                var cacheContents = cache.GetCacheItem(CacheName);
+                return cacheContents.Value as IEnumerable<HotSpot>;
             }
             else
             {
-                return cacheContents.Value as IEnumerable<HotSpot>;
+                return await RetriveHotSpotData(CacheName);
             }
         }
 
@@ -158,23 +159,24 @@ namespace Sample.Controllers
         /// <returns></returns>
         private async Task<IEnumerable<HotSpot>> RetriveHotSpotData(string cacheName)
         {
-            const string targetUri = "http://data.ntpc.gov.tw/NTPC/od/data/api/IMC123/?$format=json";
-
             var client = new HttpClient
             {
                 MaxResponseContentBufferSize = Int32.MaxValue
             };
-            var response = await client.GetStreamAsync(targetUri);
 
-            var collection = 
-                JsonConvert.DeserializeObject<IEnumerable<HotSpot>>(response.ToString());
+            var response = await client.GetStringAsync(TargetUri);
 
+            var collection =
+                JsonConvert.DeserializeObject<IEnumerable<HotSpot>>(response);
+
+            //資料快取
+            ObjectCache cacheItem = MemoryCache.Default;
+            
             var policy = new CacheItemPolicy
             {
                 AbsoluteExpiration = DateTime.Now.AddMinutes(30)
             };
-
-            ObjectCache cacheItem = MemoryCache.Default;
+            
             cacheItem.Add(cacheName, collection, policy);
 
             return collection;
