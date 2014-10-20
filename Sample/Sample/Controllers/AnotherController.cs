@@ -1,16 +1,15 @@
-﻿using System;
+﻿using PagedList;
+using Sample.Models;
+using Sample.ViewModels;
+using ServiceStack;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
-using PagedList;
-using Sample.Models;
-using Sample.ViewModels;
-using ServiceStack;
 
 namespace Sample.Controllers
 {
@@ -35,7 +34,6 @@ namespace Sample.Controllers
         {
             get { return this.GetCompanys(); }
         }
-
 
         public async Task<ActionResult> Index(int page = 1)
         {
@@ -63,8 +61,6 @@ namespace Sample.Controllers
             int pageIndex = model.PageIndex < 1 ? 1 : model.PageIndex;
 
             var source = await this.GetHotSpotData();
-            source = source.AsQueryable();
-
             source = source.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(model.SearchParameter.District))
