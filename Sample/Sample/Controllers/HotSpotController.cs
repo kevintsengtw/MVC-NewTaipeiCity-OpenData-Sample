@@ -1,4 +1,5 @@
-﻿using PagedList;
+﻿using Newtonsoft.Json;
+using PagedList;
 using Sample.Models;
 using ServiceStack;
 using System;
@@ -174,11 +175,11 @@ namespace Sample.Controllers
             sw.Start();
 
             //使用 JSON.Net
-            //var collection =
-            //    JsonConvert.DeserializeObject<IEnumerable<HotSpot>>(response);
+            var collection =
+                JsonConvert.DeserializeObject<IEnumerable<HotSpot>>(response);
 
             //使用 ServiceStack.Text (速度比 JSON.Net 快)
-            var collection = response.FromJson<IEnumerable<HotSpot>>();
+            //var collection = response.FromJson<IEnumerable<HotSpot>>();
 
             sw.Stop();
             var ts = sw.Elapsed;

@@ -1,4 +1,5 @@
-﻿using PagedList;
+﻿using Newtonsoft.Json;
+using PagedList;
 using Sample.Models;
 using Sample.ViewModels;
 using ServiceStack;
